@@ -183,16 +183,18 @@ const InvoiceTemplate = ({
   {/* RIGHT SIDE */}
   <div style={{ flex: 1, fontSize: "16px" }}>
     
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-      <span>GST 18%:</span>
-      <span style={{ fontWeight: "600" }}>₹ {gst.toFixed(2)}</span>
-    </div>
+    {Number(form?.gstPercent) > 0 && (
+  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+    <span>GST {form.gstPercent}%:</span>
+    <span style={{ fontWeight: "600" }}>₹ {gst.toFixed(2)}</span>
+  </div>
+)}
 
     <div style={{ display: "flex", justifyContent: "space-between" }}>
       <span>
-        Sum-total <br />
-        (inclusive of Taxes):
-      </span>
+  Sum-total <br />
+  ({Number(form?.gstPercent) > 0 ? "inclusive of Taxes" : "without GST"}):
+</span>
       <span style={{ fontWeight: "700" }}>
         ₹ {total.toFixed(2)}
       </span>

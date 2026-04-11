@@ -25,36 +25,37 @@ const InvoiceForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
 
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear()).slice(-2);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
 
-  return `${day}/${month}/${year}`;
-};
- const handleChange = (e) => {
-  const { name, value } = e.target;
+    return `${day}/${month}/${year}`;
+  };
 
-  let updatedValue = value;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  if (name === "date" && value) {
-    updatedValue = formatDate(value);
-  }
+    let updatedValue = value;
 
-  setForm((prev) => ({
-    ...prev,
-    [name]: updatedValue,
-  }));
+    if (name === "date" && value) {
+      updatedValue = formatDate(value);
+    }
 
-  if (errors[name]) {
-    setErrors((prev) => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: "",
+      [name]: updatedValue,
     }));
-  }
-};
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+  };
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -93,7 +94,6 @@ const formatDate = (dateStr) => {
           label="Date"
           type="date"
           name="date"
-          placeholder="dd/mm/yy"
           value={form.date || ""}
           onChange={handleChange}
           error={errors.date}
@@ -137,6 +137,16 @@ const formatDate = (dateStr) => {
               value={form.paymentMethod || ""}
               onChange={handleChange}
               placeholder="Cash / UPI / Online / Bank Transfer"
+            />
+
+            {/* ✅ NEW GST FIELD */}
+            <FormField
+              label="GST %"
+              name="gstPercent"
+              type="number"
+              value={form.gstPercent || ""}
+              onChange={handleChange}
+              placeholder="Leave empty if no GST"
             />
           </div>
         </>
@@ -186,6 +196,16 @@ const formatDate = (dateStr) => {
               onChange={handleChange}
               placeholder="Enter discount percentage"
             />
+
+            {/* ✅ GST ALSO FOR TEMPLATE 2 */}
+            <FormField
+              label="GST %"
+              name="gstPercent"
+              type="number"
+              value={form.gstPercent || ""}
+              onChange={handleChange}
+              placeholder="Leave empty if no GST"
+            />
           </div>
         </>
       )}
@@ -205,7 +225,9 @@ const formatDate = (dateStr) => {
           <input
             placeholder="Item name"
             value={item.name}
-            onChange={(e) => handleItemChange(index, "name", e.target.value)}
+            onChange={(e) =>
+              handleItemChange(index, "name", e.target.value)
+            }
             style={inputStyle}
           />
 
@@ -221,7 +243,9 @@ const formatDate = (dateStr) => {
 
           <select
             value={item.unit || "Hr"}
-            onChange={(e) => handleItemChange(index, "unit", e.target.value)}
+            onChange={(e) =>
+              handleItemChange(index, "unit", e.target.value)
+            }
             style={smallInput}
           >
             <option value="Hr">Hr</option>
@@ -246,7 +270,6 @@ const formatDate = (dateStr) => {
               type="button"
               onClick={() => removeItem(index)}
               style={iconButton}
-              aria-label="Remove item"
             >
               <FaTrash />
             </button>
@@ -255,17 +278,17 @@ const formatDate = (dateStr) => {
       ))}
 
       <button
-  type="button"
-  onClick={addItem}
-  style={{
-    ...addButton,
-    opacity: items.length >= 5 ? 0.5 : 1,
-    cursor: items.length >= 5 ? "not-allowed" : "pointer",
-  }}
-  disabled={items.length >= 5}
->
-  <FaPlus /> Add Item
-</button>
+        type="button"
+        onClick={addItem}
+        style={{
+          ...addButton,
+          opacity: items.length >= 5 ? 0.5 : 1,
+          cursor: items.length >= 5 ? "not-allowed" : "pointer",
+        }}
+        disabled={items.length >= 5}
+      >
+        <FaPlus /> Add Item
+      </button>
     </div>
   );
 };
@@ -304,7 +327,6 @@ const FormField = ({
     </div>
   );
 };
-
 const containerStyle = {
   background: "#ffffff",
   padding: "28px",

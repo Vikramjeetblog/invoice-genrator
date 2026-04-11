@@ -22,7 +22,7 @@ const InvoiceTemplate2 = ({
   items = [],
   subtotal = 0,
 }) => {
-  const discountPercent = Number(form?.discountPercent || 65);
+  const discountPercent = Number(form?.discountPercent);
   const discount = subtotal * (discountPercent / 100);
   const finalTotal = subtotal - discount;
 
@@ -181,7 +181,11 @@ const InvoiceTemplate2 = ({
             <span>{item.name || "Service Name"}</span>
 
             <span style={{ textAlign: "right" }}>
-              ₹ {Number(item.price || 0).toFixed(2)} / {item.unit || "Hr"}
+              {item.unit && item.unit !== "Hr" ? (
+  <>₹ {Number(item.price || 0).toFixed(2)} / {item.unit}</>
+) : (
+  <>₹ {Number(item.price || 0).toFixed(2)}</>
+)}
             </span>
 
             <span style={{ textAlign: "center" }}>{item.qty || 0}</span>
