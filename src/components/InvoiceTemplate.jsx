@@ -232,8 +232,8 @@ const InvoiceTemplate = ({
       lineHeight: 1.5,
     }}
   >
-    <span>+91 7477-5666</span>
-    <span>+91 78110-000</span>
+    <span>+917811092672</span>
+    
   
 </div>
               
