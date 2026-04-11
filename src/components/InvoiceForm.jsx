@@ -25,21 +25,36 @@ const InvoiceForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+const formatDate = (dateStr) => {
+  const date = new Date(dateStr);
 
-    setForm((prev) => ({
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `${day}/${month}/${year}`;
+};
+ const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  let updatedValue = value;
+
+  if (name === "date" && value) {
+    updatedValue = formatDate(value);
+  }
+
+  setForm((prev) => ({
+    ...prev,
+    [name]: updatedValue,
+  }));
+
+  if (errors[name]) {
+    setErrors((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: "",
     }));
-
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
+  }
+};
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -78,6 +93,7 @@ const InvoiceForm = ({
           label="Date"
           type="date"
           name="date"
+          placeholder="dd/mm/yy"
           value={form.date || ""}
           onChange={handleChange}
           error={errors.date}
@@ -238,9 +254,18 @@ const InvoiceForm = ({
         </div>
       ))}
 
-      <button type="button" onClick={addItem} style={addButton}>
-        <FaPlus /> Add Item
-      </button>
+      <button
+  type="button"
+  onClick={addItem}
+  style={{
+    ...addButton,
+    opacity: items.length >= 5 ? 0.5 : 1,
+    cursor: items.length >= 5 ? "not-allowed" : "pointer",
+  }}
+  disabled={items.length >= 5}
+>
+  <FaPlus /> Add Item
+</button>
     </div>
   );
 };
