@@ -172,7 +172,7 @@ const InvoiceTemplate = ({
 
     <div style={{ display: "flex", gap: "10px" }}>
       <span><strong>Payment Mode :</strong></span>
-      <span>{form?.paymentMethod || "Online"}</span>
+      <span>{form?.paymentMethod}</span>
     </div>
 
   </div>

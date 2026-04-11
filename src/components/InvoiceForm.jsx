@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import React, { useState, forwardRef } from "react";
+import { FaPlus, FaTrash, FaCalendarAlt } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const InvoiceForm = ({
   form,
@@ -25,28 +27,12 @@ const InvoiceForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = String(date.getFullYear()).slice(-2);
-
-    return `${day}/${month}/${year}`;
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    let updatedValue = value;
-
-    if (name === "date" && value) {
-      updatedValue = formatDate(value);
-    }
-
     setForm((prev) => ({
       ...prev,
-      [name]: updatedValue,
+      [name]: value,
     }));
 
     if (errors[name]) {
@@ -76,6 +62,43 @@ const InvoiceForm = ({
     setItems(items.filter((_, i) => i !== index));
   };
 
+  const formatDateForDisplay = (date) => {
+    if (!date) return "";
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const parseDisplayDate = (dateStr) => {
+    if (!dateStr) return null;
+
+    const parts = dateStr.split("/");
+    if (parts.length !== 3) return null;
+
+    const [day, month, year] = parts.map(Number);
+
+    if (!day || !month || !year) return null;
+
+    return new Date(year, month - 1, day);
+  };
+
+  const isTemplate1 = selectedTemplate === "template1";
+
+  const dynamicItemsHeader = {
+    ...itemsHeader,
+    gridTemplateColumns: isTemplate1
+      ? "2.2fr 0.8fr 1fr 1fr"
+      : "2.2fr 0.8fr 0.9fr 1fr 1fr",
+  };
+
+  const dynamicItemRow = {
+    ...itemRow,
+    gridTemplateColumns: isTemplate1
+      ? "2.2fr 0.8fr 1fr 1fr"
+      : "2.2fr 0.8fr 0.9fr 1fr 1fr",
+  };
+
   return (
     <div style={containerStyle}>
       <h2 style={titleStyle}>Create Invoice</h2>
@@ -90,14 +113,33 @@ const InvoiceForm = ({
           placeholder="Enter invoice number"
         />
 
-        <FormField
-          label="Date"
-          type="date"
-          name="date"
-          value={form.date || ""}
-          onChange={handleChange}
-          error={errors.date}
-        />
+        <div style={fieldWrap}>
+          <label htmlFor="date" style={labelStyle}>
+            Date
+          </label>
+
+          <DatePicker
+            selected={parseDisplayDate(form.date)}
+            onChange={(date) => {
+              setForm((prev) => ({
+                ...prev,
+                date: formatDateForDisplay(date),
+              }));
+
+              if (errors.date) {
+                setErrors((prev) => ({
+                  ...prev,
+                  date: "",
+                }));
+              }
+            }}
+            dateFormat="d/M/yyyy"
+            placeholderText="dd/mm/yyyy"
+            customInput={<CustomDateInput error={errors.date} />}
+          />
+
+          {errors.date ? <span style={errorStyle}>{errors.date}</span> : null}
+        </div>
 
         <FormField
           label="Customer Name"
@@ -139,7 +181,6 @@ const InvoiceForm = ({
               placeholder="Cash / UPI / Online / Bank Transfer"
             />
 
-            {/* ✅ NEW GST FIELD */}
             <FormField
               label="GST %"
               name="gstPercent"
@@ -197,37 +238,31 @@ const InvoiceForm = ({
               placeholder="Enter discount percentage"
             />
 
-            {/* ✅ GST ALSO FOR TEMPLATE 2 */}
-            <FormField
-              label="GST %"
-              name="gstPercent"
-              type="number"
-              value={form.gstPercent || ""}
-              onChange={handleChange}
-              placeholder="Leave empty if no GST"
-            />
+            
           </div>
         </>
       )}
 
       <div style={sectionTitle}>Items</div>
 
-      <div style={itemsHeader}>
+      <div style={dynamicItemsHeader}>
         <span>Item</span>
         <span style={{ textAlign: "center" }}>Qty</span>
-        <span style={{ textAlign: "center" }}>Unit</span>
+
+        {selectedTemplate !== "template1" && (
+          <span style={{ textAlign: "center" }}>Unit</span>
+        )}
+
         <span style={{ textAlign: "right" }}>Price</span>
         <span style={{ textAlign: "right" }}>Total</span>
       </div>
 
       {items.map((item, index) => (
-        <div key={index} style={itemRow}>
+        <div key={index} style={dynamicItemRow}>
           <input
             placeholder="Item name"
             value={item.name}
-            onChange={(e) =>
-              handleItemChange(index, "name", e.target.value)
-            }
+            onChange={(e) => handleItemChange(index, "name", e.target.value)}
             style={inputStyle}
           />
 
@@ -241,16 +276,18 @@ const InvoiceForm = ({
             style={smallInput}
           />
 
-          <select
-            value={item.unit || "Hr"}
-            onChange={(e) =>
-              handleItemChange(index, "unit", e.target.value)
-            }
-            style={smallInput}
-          >
-            <option value="Hr">Hr</option>
-            <option value="Min">Min</option>
-          </select>
+          {selectedTemplate !== "template1" && (
+            <select
+              value={item.unit || "Hr"}
+              onChange={(e) =>
+                handleItemChange(index, "unit", e.target.value)
+              }
+              style={smallInput}
+            >
+              <option value="Hr">Hr</option>
+              <option value="Min">Min</option>
+            </select>
+          )}
 
           <input
             type="number"
@@ -295,6 +332,27 @@ const InvoiceForm = ({
 
 export default InvoiceForm;
 
+const CustomDateInput = forwardRef(
+  ({ value, onClick, placeholder, error }, ref) => (
+    <button
+      type="button"
+      onClick={onClick}
+      ref={ref}
+      style={{
+        ...dateButtonStyle,
+        borderColor: error ? "#dc2626" : "#d1d5db",
+      }}
+    >
+      <span style={{ color: value ? "#111827" : "#9ca3af" }}>
+        {value || placeholder || "dd/mm/yyyy"}
+      </span>
+      <FaCalendarAlt style={{ color: "#111827", flexShrink: 0 }} />
+    </button>
+  )
+);
+
+CustomDateInput.displayName = "CustomDateInput";
+
 const FormField = ({
   label,
   error,
@@ -327,6 +385,7 @@ const FormField = ({
     </div>
   );
 };
+
 const containerStyle = {
   background: "#ffffff",
   padding: "28px",
@@ -384,6 +443,21 @@ const inputStyle = {
   boxSizing: "border-box",
 };
 
+const dateButtonStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  border: "1px solid #d1d5db",
+  borderRadius: "10px",
+  fontSize: "14px",
+  background: "#fff",
+  boxSizing: "border-box",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  cursor: "pointer",
+  minHeight: "46px",
+};
+
 const errorStyle = {
   color: "#dc2626",
   fontSize: "12px",
@@ -402,7 +476,6 @@ const smallInputRight = {
 
 const itemsHeader = {
   display: "grid",
-  gridTemplateColumns: "2.2fr 0.8fr 0.9fr 1fr 1fr",
   gap: "12px",
   fontWeight: "700",
   fontSize: "13px",
@@ -413,7 +486,6 @@ const itemsHeader = {
 
 const itemRow = {
   display: "grid",
-  gridTemplateColumns: "2.2fr 0.8fr 0.9fr 1fr 1fr",
   gap: "12px",
   marginBottom: "12px",
   alignItems: "center",

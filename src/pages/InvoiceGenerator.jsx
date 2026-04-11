@@ -22,6 +22,7 @@ const InvoiceGenerator = () => {
     accountNo: "",
     ifsc: "",
     discountPercent: "",
+    gstPercent: "",
   });
 
   const [items, setItems] = useState([{ name: "", qty: 1, price: 0 }]);
@@ -33,8 +34,13 @@ const InvoiceGenerator = () => {
     0
   );
 
-  const gst = subtotal * 0.18;
-  const total = subtotal + gst;
+const gstPercent =
+  form.gstPercent !== undefined && form.gstPercent !== ""
+    ? Number(form.gstPercent)
+    : 0;
+
+const gst = (subtotal * gstPercent) / 100;
+const total = subtotal + gst;
 
   const renderTemplate = () => {
     const props = {
