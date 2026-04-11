@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-/*  A4 PERFECT FIX */
-#print-area, #invoice {
-  width: 794px !important;
-  height: 1123px !important;
-  overflow: hidden;
-}
 
 /* REMOVE ANY TRANSFORM DURING PRINT */
 @media print {

@@ -35,14 +35,17 @@ const InvoiceTemplate = ({
     <div
       id="invoice"
       style={{
-        width: "794px",
-        height: "1123px",
-        margin: "auto",
+        width: "210mm",
+        minHeight: "296mm",
+        height: "auto",
+        margin: "0",
+        boxSizing: "border-box",
         backgroundImage: "url('/background-image.png')",
         backgroundSize: "cover",
         backgroundPosition: "top center",
         backgroundRepeat: "no-repeat",
-        padding: "30px",
+        padding: "15mm",
+        overflow: "hidden",
         boxSizing: "border-box",
         fontFamily: fonts.inter,
         display: "flex",
@@ -55,10 +58,11 @@ const InvoiceTemplate = ({
           borderRadius: "6px",
           border: "5px solid #f0e81b",
           padding: "30px",
-          margin: "35px 15px",
+          margin: "0",
           display: "flex",
           flexDirection: "column",
           width: "100%",
+
         }}
       >
         {/* HEADER */}
@@ -114,7 +118,7 @@ const InvoiceTemplate = ({
         </div>
 
         {/* TABLE */}
-        <div style={{ height: "400px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <div style={{ height: "370px", overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <div style={{
             background: "#f5ee4d",
             padding: "12px 10px",
@@ -151,21 +155,52 @@ const InvoiceTemplate = ({
         <div style={{ height: "2px", background: "#f0e81b", margin: "10px -30px" }} />
 
         {/* TOTAL */}
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: 1, fontSize: "16px" }}>
-            <p><strong>Amount Received:</strong> ₹{form?.amountReceived || 0}</p>
-            <p><strong>Amount Due:</strong> ₹{form?.amountDue || total.toFixed(2)}</p>
-            <p><strong>Payment Mode:</strong> {form?.paymentMethod || "Cash"}</p>
-          </div>
+       <div style={{ display: "flex", alignItems: "stretch" }}>
+  
+  {/* LEFT SIDE */}
+  <div style={{ flex: 1, fontSize: "16px" }}>
+    
+    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+      <span><strong>Amount Received :</strong></span>
+      <span>₹ {form?.amountReceived || total.toFixed(2)}</span>
+    </div>
 
-          <div style={{ width: "2px", background: "#f0e81b" }} />
+    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+      <span><strong>Amount Due :</strong></span>
+      <span>₹ {form?.amountDue || 0}</span>
+    </div>
 
-          <div style={{ flex: 1, textAlign: "right" }}>
-            <p><strong>GST 18%:</strong> ₹{gst.toFixed(2)}</p>
-            <p><strong>Sum-total:</strong></p>
-            <p style={{ fontWeight: "700", fontSize: "18px" }}>₹ {total.toFixed(2)}</p>
-          </div>
-        </div>
+    <div style={{ display: "flex", gap: "10px" }}>
+      <span><strong>Payment Mode :</strong></span>
+      <span>{form?.paymentMethod || "Online"}</span>
+    </div>
+
+  </div>
+
+  {/* CENTER DIVIDER */}
+  <div style={{ width: "2px", background: "#f0e81b", margin: "0 20px" }} />
+
+  {/* RIGHT SIDE */}
+  <div style={{ flex: 1, fontSize: "16px" }}>
+    
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+      <span>GST 18%:</span>
+      <span style={{ fontWeight: "600" }}>₹ {gst.toFixed(2)}</span>
+    </div>
+
+    <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span>
+        Sum-total <br />
+        (inclusive of Taxes):
+      </span>
+      <span style={{ fontWeight: "700" }}>
+        ₹ {total.toFixed(2)}
+      </span>
+    </div>
+
+  </div>
+
+</div>
 
         {/* 🔥 FULL WIDTH LINE */}
         <div style={{ height: "2px", background: "#f0e81b", margin: "20px -30px" }} />
@@ -173,15 +208,33 @@ const InvoiceTemplate = ({
         {/* FOOTER */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>
-            <p style={{ fontFamily: fonts.spartan, fontWeight: "700" }}>Contact us:</p>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <div style={circleStyle}>
-                <FaPhoneVolume size={16} color="#fff" />
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", fontWeight: "700" }}>
-                <span>+91 7477-5666</span>
-                <span>+91 78110-000</span>
-              </div>
+            <p
+  style={{
+    fontFamily: fonts.spartan,
+    fontWeight: "700",
+    margin: "0 0 10px 0",
+  }}
+>
+  Contact us:
+</p>
+
+<div style={{ display: "flex",  gap: "10px", alignItems: "flex-start" }}>
+  <div style={circleStyle}>
+    <FaPhoneVolume size={16} color="#fff"/>
+  </div>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      fontWeight: "700",
+      lineHeight: 1.5,
+    }}
+  >
+    <span>+91 7477-5666</span>
+    <span>+91 78110-000</span>
+  
+</div>
+              
             </div>
           </div>
 
@@ -193,8 +246,9 @@ const InvoiceTemplate = ({
             </div>
 
             <div style={{ marginTop: "7px", fontSize: "16px", fontWeight: "700" }}>
+               <p style={{ margin: 0 }}>@thechordifiers.studio</p>
               <p style={{ margin: 0 }}>www.thechordifiers.studio</p>
-              <p style={{ margin: 0 }}>thechordifiers@gmail.com</p>
+             
             </div>
           </div>
         </div>

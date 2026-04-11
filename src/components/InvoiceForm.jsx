@@ -1,30 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
-const InvoiceForm = ({ form, setForm, items, setItems }) => {
+const InvoiceForm = ({
+  form,
+  setForm,
+  items,
+  setItems,
+  selectedTemplate,
+}) => {
   const [errors, setErrors] = useState({});
 
-  // 🔥 Auto Invoice No
-  useEffect(() => {
-    if (!form.invoiceNo) {
-      setForm((prev) => ({
-        ...prev,
-        invoiceNo: "INV-" + Date.now().toString().slice(-5),
-      }));
-    }
-  }, []);
-
-  // 🔥 Validation
   const validate = () => {
     const newErrors = {};
-    if (!form.customerName) newErrors.customerName = "Required";
-    if (!form.date) newErrors.date = "Required";
+
+    if (!form.customerName?.trim()) {
+      newErrors.customerName = "Customer name is required";
+    }
+
+    if (!form.date) {
+      newErrors.date = "Date is required";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const handleItemChange = (index, field, value) => {
@@ -34,10 +48,15 @@ const InvoiceForm = ({ form, setForm, items, setItems }) => {
   };
 
   const addItem = () => {
-    setItems([...items, { name: "", qty: 1, price: 0 }]);
+    setItems([...items, { name: "", qty: 1, price: 0, unit: "Hr" }]);
   };
 
   const removeItem = (index) => {
+    if (items.length === 1) {
+      setItems([{ name: "", qty: 1, price: 0, unit: "Hr" }]);
+      return;
+    }
+
     setItems(items.filter((_, i) => i !== index));
   };
 
@@ -45,72 +64,132 @@ const InvoiceForm = ({ form, setForm, items, setItems }) => {
     <div style={containerStyle}>
       <h2 style={titleStyle}>Create Invoice</h2>
 
-      {/* 🔥 FORM */}
+      <div style={sectionTitle}>Invoice Details</div>
       <div style={gridStyle}>
-        <FloatingInput
+        <FormField
           label="Invoice No"
           name="invoiceNo"
-          value={form.invoiceNo}
+          value={form.invoiceNo || ""}
           onChange={handleChange}
+          placeholder="Enter invoice number"
         />
 
-        <FloatingInput
+        <FormField
           label="Date"
           type="date"
           name="date"
-          value={form.date}
+          value={form.date || ""}
           onChange={handleChange}
           error={errors.date}
         />
 
-        <FloatingInput
+        <FormField
           label="Customer Name"
           name="customerName"
-          value={form.customerName}
+          value={form.customerName || ""}
           onChange={handleChange}
+          placeholder="Enter customer name"
           error={errors.customerName}
-        />
-
-        {/* ✅ NEW FIELDS */}
-        <FloatingInput
-          label="Amount Received"
-          name="amountReceived"
-          value={form.amountReceived}
-          onChange={handleChange}
-        />
-
-        <FloatingInput
-          label="Amount Due"
-          name="amountDue"
-          value={form.amountDue}
-          onChange={handleChange}
-        />
-
-        <FloatingInput
-          label="Payment Method"
-          name="paymentMethod"
-          value={form.paymentMethod}
-          onChange={handleChange}
         />
       </div>
 
-      {/* ITEMS HEADER */}
+      {selectedTemplate === "template1" && (
+        <>
+          <div style={sectionTitle}>Payment Details</div>
+          <div style={gridStyle}>
+            <FormField
+              label="Amount Received"
+              name="amountReceived"
+              type="number"
+              value={form.amountReceived || ""}
+              onChange={handleChange}
+              placeholder="Enter amount received"
+            />
+
+            <FormField
+              label="Amount Due"
+              name="amountDue"
+              type="number"
+              value={form.amountDue || ""}
+              onChange={handleChange}
+              placeholder="Enter amount due"
+            />
+
+            <FormField
+              label="Payment Method"
+              name="paymentMethod"
+              value={form.paymentMethod || ""}
+              onChange={handleChange}
+              placeholder="Cash / UPI / Online / Bank Transfer"
+            />
+          </div>
+        </>
+      )}
+
+      {selectedTemplate === "template2" && (
+        <>
+          <div style={sectionTitle}>Payment Details</div>
+          <div style={gridStyle}>
+            <FormField
+              label="Bank Name"
+              name="bankName"
+              value={form.bankName || ""}
+              onChange={handleChange}
+              placeholder="Enter bank name"
+            />
+
+            <FormField
+              label="Account Name"
+              name="accountName"
+              value={form.accountName || ""}
+              onChange={handleChange}
+              placeholder="Enter account holder name"
+            />
+
+            <FormField
+              label="Account No"
+              name="accountNo"
+              value={form.accountNo || ""}
+              onChange={handleChange}
+              placeholder="Enter account number"
+            />
+
+            <FormField
+              label="IFSC Code"
+              name="ifsc"
+              value={form.ifsc || ""}
+              onChange={handleChange}
+              placeholder="Enter IFSC code"
+            />
+
+            <FormField
+              label="Discount %"
+              name="discountPercent"
+              type="number"
+              value={form.discountPercent || ""}
+              onChange={handleChange}
+              placeholder="Enter discount percentage"
+            />
+          </div>
+        </>
+      )}
+
+      <div style={sectionTitle}>Items</div>
+
       <div style={itemsHeader}>
         <span>Item</span>
         <span style={{ textAlign: "center" }}>Qty</span>
+        <span style={{ textAlign: "center" }}>Unit</span>
         <span style={{ textAlign: "right" }}>Price</span>
         <span style={{ textAlign: "right" }}>Total</span>
       </div>
 
-      {/* ITEMS */}
       {items.map((item, index) => (
         <div key={index} style={itemRow}>
           <input
             placeholder="Item name"
             value={item.name}
-            onChange={(e) =>
-              handleItemChange(index, "name", e.target.value)
-            }
+            onChange={(e) => handleItemChange(index, "name", e.target.value)}
             style={inputStyle}
           />
 
@@ -124,6 +203,15 @@ const InvoiceForm = ({ form, setForm, items, setItems }) => {
             style={smallInput}
           />
 
+          <select
+            value={item.unit || "Hr"}
+            onChange={(e) => handleItemChange(index, "unit", e.target.value)}
+            style={smallInput}
+          >
+            <option value="Hr">Hr</option>
+            <option value="Min">Min</option>
+          </select>
+
           <input
             type="number"
             min="0"
@@ -131,18 +219,26 @@ const InvoiceForm = ({ form, setForm, items, setItems }) => {
             onChange={(e) =>
               handleItemChange(index, "price", Number(e.target.value))
             }
-            style={smallInput}
+            style={smallInputRight}
           />
 
           <div style={totalBox}>
-            <span>₹ {item.qty * item.price}</span>
-            <FaTrash style={deleteIcon} onClick={() => removeItem(index)} />
+            <span style={totalText}>
+              ₹ {((item.qty || 0) * (item.price || 0)).toFixed(2)}
+            </span>
+            <button
+              type="button"
+              onClick={() => removeItem(index)}
+              style={iconButton}
+              aria-label="Remove item"
+            >
+              <FaTrash />
+            </button>
           </div>
         </div>
       ))}
 
-      {/* ACTION */}
-      <button onClick={addItem} style={addButton}>
+      <button type="button" onClick={addItem} style={addButton}>
         <FaPlus /> Add Item
       </button>
     </div>
@@ -151,71 +247,100 @@ const InvoiceForm = ({ form, setForm, items, setItems }) => {
 
 export default InvoiceForm;
 
-
-// 🔥 FLOATING INPUT COMPONENT
-const FloatingInput = ({ label, error, ...props }) => {
+const FormField = ({
+  label,
+  error,
+  type = "text",
+  name,
+  value,
+  onChange,
+  placeholder,
+}) => {
   return (
-    <div style={{ position: "relative" }}>
-      <input {...props} style={inputStyle} />
-
-      <label style={floatingLabel(props.value)}>
+    <div style={fieldWrap}>
+      <label htmlFor={name} style={labelStyle}>
         {label}
       </label>
 
-      {error && <span style={errorStyle}>{error}</span>}
+      <input
+        id={name}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        style={{
+          ...inputStyle,
+          borderColor: error ? "#dc2626" : "#d1d5db",
+        }}
+      />
+
+      {error ? <span style={errorStyle}>{error}</span> : null}
     </div>
   );
 };
 
-
-// 🎨 STYLES
-
 const containerStyle = {
-  background: "#fff",
-  padding: "25px",
-  borderRadius: "10px",
-  maxWidth: "900px",
+  background: "#ffffff",
+  padding: "28px",
+  borderRadius: "14px",
+  maxWidth: "950px",
   margin: "20px auto",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-  fontFamily: "'Poppins', sans-serif",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+  fontFamily: "'Inter', sans-serif",
 };
 
 const titleStyle = {
-  fontSize: "22px",
-  fontWeight: "600",
-  marginBottom: "20px",
+  fontSize: "24px",
+  fontWeight: "700",
+  marginBottom: "22px",
+  color: "#111827",
+};
+
+const sectionTitle = {
+  fontSize: "14px",
+  fontWeight: "700",
+  color: "#374151",
+  marginBottom: "12px",
+  marginTop: "10px",
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
 };
 
 const gridStyle = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr", // same layout
-  gap: "12px",
-  marginBottom: "20px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "16px",
+  marginBottom: "24px",
+};
+
+const fieldWrap = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "7px",
+};
+
+const labelStyle = {
+  fontSize: "13px",
+  fontWeight: "600",
+  color: "#374151",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "14px 10px 6px",
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  fontSize: "13px",
+  padding: "12px 14px",
+  border: "1px solid #d1d5db",
+  borderRadius: "10px",
+  fontSize: "14px",
   outline: "none",
+  background: "#fff",
+  boxSizing: "border-box",
 };
 
-const floatingLabel = (value) => ({
-  position: "absolute",
-  left: "10px",
-  top: value ? "4px" : "12px",
-  fontSize: value ? "10px" : "13px",
-  color: "#777",
-  transition: "0.2s",
-  background: "#fff",
-  padding: "0 4px",
-});
-
 const errorStyle = {
-  color: "red",
-  fontSize: "10px",
+  color: "#dc2626",
+  fontSize: "12px",
+  marginTop: "2px",
 };
 
 const smallInput = {
@@ -223,38 +348,69 @@ const smallInput = {
   textAlign: "center",
 };
 
+const smallInputRight = {
+  ...inputStyle,
+  textAlign: "right",
+};
+
 const itemsHeader = {
   display: "grid",
-  gridTemplateColumns: "2fr 1fr 1fr 1fr",
-  fontWeight: "600",
+  gridTemplateColumns: "2.2fr 0.8fr 0.9fr 1fr 1fr",
+  gap: "12px",
+  fontWeight: "700",
   fontSize: "13px",
-  marginBottom: "8px",
+  color: "#374151",
+  marginBottom: "10px",
+  padding: "0 4px",
 };
 
 const itemRow = {
   display: "grid",
-  gridTemplateColumns: "2fr 1fr 1fr 1fr",
-  gap: "10px",
-  marginBottom: "10px",
+  gridTemplateColumns: "2.2fr 0.8fr 0.9fr 1fr 1fr",
+  gap: "12px",
+  marginBottom: "12px",
+  alignItems: "center",
 };
 
 const totalBox = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  border: "1px solid #d1d5db",
+  borderRadius: "10px",
+  padding: "12px 14px",
+  minHeight: "44px",
+  boxSizing: "border-box",
 };
 
-const deleteIcon = {
-  cursor: "pointer",
+const totalText = {
+  fontSize: "14px",
+  fontWeight: "600",
+  color: "#111827",
+};
+
+const iconButton = {
+  background: "transparent",
+  border: "none",
   color: "#ef4444",
+  cursor: "pointer",
+  fontSize: "14px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 };
 
 const addButton = {
-  marginTop: "10px",
-  background: "#000",
-  color: "#fff",
-  padding: "10px",
-  borderRadius: "6px",
+  marginTop: "8px",
+  background: "#111827",
+  color: "#ffffff",
+  padding: "12px 16px",
+  borderRadius: "10px",
   border: "none",
   cursor: "pointer",
+  fontSize: "14px",
+  fontWeight: "600",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "8px",
 };
