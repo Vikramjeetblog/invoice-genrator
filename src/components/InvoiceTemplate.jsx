@@ -157,12 +157,20 @@ const InvoiceTemplate = ({
         {/* TOTAL */}
        <div style={{ display: "flex", alignItems: "stretch" }}>
   
-  {/* LEFT SIDE */}
+
+  
+
+   {/* LEFT SIDE */}
   <div style={{ flex: 1, fontSize: "16px" }}>
-    
+
+    <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+      <span><strong>Total Amount Received :</strong></span>
+      <span>₹ {total.toFixed(2)}</span>
+    </div>
+
     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
       <span><strong>Amount Received :</strong></span>
-      <span>₹ {form?.amountReceived || total.toFixed(2)}</span>
+      <span>₹ {form?.amountReceived || 0}</span>
     </div>
 
     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
