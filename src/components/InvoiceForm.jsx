@@ -156,10 +156,10 @@ const InvoiceForm = ({
           <div style={sectionTitle}>Payment Details</div>
           <div style={gridStyle}>
             <FormField
-              label="Total Amount Recived"
-              name="totalamountrecived"
+              label="Total Amount Received"
+              name="totalAmountReceived"
               type="number"
-              value={form.totalamountrecived || ""}
+              value={form.totalAmountReceived|| ""}
               onChange={handleChange}
               placeholder="Enter amount received"
             />
