@@ -12,7 +12,7 @@ const InvoiceGenerator = () => {
     customerName: "",
 
     // Template 1 fields
-  totalamountrecived: "",
+totalAmountReceived: "",
     amountReceived: "",
     amountDue: "",
     paymentMethod: "",
