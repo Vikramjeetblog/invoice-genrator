@@ -165,7 +165,7 @@ const InvoiceTemplate = ({
 
     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
   <span><strong>Total Amount Received :</strong></span>
-  <span>₹ {form?.totalamountrecived || 0}</span>
+  <span>₹ {form?.totalAmountReceived || 0}</span>
 </div>
 
     <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
